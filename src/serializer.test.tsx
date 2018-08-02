@@ -85,3 +85,14 @@ test('supports pseudo selectors', () => {
   });
   checkSnapshotForEachMethod(<div className={css(styles.root)} />);
 });
+
+test('works on multiple snapshots', () => {
+  checkSnapshotForEachMethod(
+    <Wrapper>
+      <Title>
+        Hello World, this is my first component styled with aphrodite!
+      </Title>
+    </Wrapper>,
+    2
+  );
+});

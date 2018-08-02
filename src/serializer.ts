@@ -13,6 +13,12 @@ interface TrackedHTMLElement extends HTMLElement {
   withStyles?: boolean;
 }
 
+interface TrackedReactTestRendererJSON extends ReactTestRendererJSON {
+  withStyles?: boolean;
+}
+
+type TrackedValue = TrackedHTMLElement | TrackedReactTestRendererJSON;
+
 export function createSerializer(
   getStyleSheetTestUtils: () => typeof StyleSheetTestUtils,
   { removeVendorPrefixes = false, classNameReplacer }: SerializerOptions = {},
@@ -26,9 +32,9 @@ export function createSerializer(
     );
   }
 
-  function print(val: ReactTestRendererJSON, printer: (val: any) => string) {
+  function print(val: TrackedValue, printer: (val: any) => string) {
     const nodes = getNodes(val);
-    nodes.forEach((node: any) => (node.withStyles = true));
+    nodes.forEach((node: TrackedValue) => (node.withStyles = true));
 
     const selectors = getSelectors(nodes);
     const styles = getStyles(
@@ -38,6 +44,8 @@ export function createSerializer(
     );
 
     const printedVal = printer(val);
+    delete val.withStyles;
+    nodes.forEach((node: TrackedValue) => delete node.withStyles);
 
     if (styles) {
       return replaceClassNames(
